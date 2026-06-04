@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-mkdir -p ~/ubuntu-setup-export && cat > ~/ubuntu-setup-export/backup-ubuntu-setup.sh <<'BASH'
+mkdir -p ~/ubuntu-setup-exports && cat > ~/ubuntu-setup-exports/backup-ubuntu-setup.sh <<'BASH'
 #!/usr/bin/env bash
 
 set -euo pipefail
@@ -13,13 +13,15 @@ set -euo pipefail
 # It intentionally does NOT back up your personal files, documents, browser data,
 # SSH keys, databases, containers, or other user data.
 
-EXPORT_DIR="${HOME}/ubuntu-setup-export"
+EXPORT_ROOT="${HOME}/ubuntu-setup-exports"
+EXPORT_STAMP="$(date +%Y-%m-%d_%H-%M-%S)"
+EXPORT_DIR="${EXPORT_ROOT}/ubuntu-setup-export-${EXPORT_STAMP}"
 APT_DIR="${EXPORT_DIR}/apt"
 DEV_DIR="${EXPORT_DIR}/developer"
 SYSTEM_DIR="${EXPORT_DIR}/system"
 RESTORE_DIR="${EXPORT_DIR}/restore"
 
-mkdir -p "${APT_DIR}" "${DEV_DIR}" "${SYSTEM_DIR}" "${RESTORE_DIR}"
+mkdir -p "${EXPORT_ROOT}" "${APT_DIR}" "${DEV_DIR}" "${SYSTEM_DIR}" "${RESTORE_DIR}"
 
 echo "Exporting Ubuntu setup to: ${EXPORT_DIR}"
 echo
@@ -219,9 +221,9 @@ cat > "${RESTORE_DIR}/restore-apt-packages.sh" <<'RESTORE_APT'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-apt-packages.sh
 #
 # This installs the manually-selected APT packages from the old machine.
@@ -239,9 +241,9 @@ cat > "${RESTORE_DIR}/restore-snaps.sh" <<'RESTORE_SNAPS'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-snaps.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -272,9 +274,9 @@ cat > "${RESTORE_DIR}/restore-flatpaks.sh" <<'RESTORE_FLATPAKS'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-flatpaks.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -301,9 +303,9 @@ cat > "${RESTORE_DIR}/restore-vscode-extensions.sh" <<'RESTORE_VSCODE'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-vscode-extensions.sh
 #
 # This assumes VS Code is already installed and the 'code' command is available.
@@ -330,9 +332,9 @@ cat > "${RESTORE_DIR}/restore-vscodium-extensions.sh" <<'RESTORE_VSCODIUM'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-vscodium-extensions.sh
 #
 # This assumes VSCodium is already installed and the 'codium' command is available.
@@ -359,9 +361,9 @@ cat > "${RESTORE_DIR}/restore-npm-global-packages.sh" <<'RESTORE_NPM'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-npm-global-packages.sh
 #
 # This assumes Node.js and npm are already installed.
@@ -388,9 +390,9 @@ cat > "${RESTORE_DIR}/restore-python-user-packages.sh" <<'RESTORE_PYTHON'
 
 set -euo pipefail
 
-# Run this from inside the ubuntu-setup-export folder:
+# Run this from inside a timestamped ubuntu-setup-export folder:
 #
-#   cd ~/ubuntu-setup-export
+#   cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 #   bash restore/restore-python-user-packages.sh
 #
 # This installs user-level Python packages.
@@ -416,6 +418,8 @@ cat > "${EXPORT_DIR}/README.md" <<'README'
 This folder contains a snapshot of installed software and developer tooling from your Ubuntu machine.
 
 It is designed to help you rebuild a new Ubuntu install without backing up personal data.
+
+This export is timestamped. Re-running the backup script creates a new sibling folder under `~/ubuntu-setup-exports/`.
 
 ## What this backs up
 
@@ -477,7 +481,7 @@ aliases, or environment variables.
 From any terminal:
 
 ```bash
-bash ~/ubuntu-setup-export/backup-ubuntu-setup.sh
+bash ~/ubuntu-setup-exports/backup-ubuntu-setup.sh
 ```
 
 ## Restore helpers
@@ -487,11 +491,12 @@ README
 
 echo
 echo "Export complete: ${EXPORT_DIR}"
+echo "All exports live under: ${EXPORT_ROOT}"
 echo "Review ${EXPORT_DIR}/README.md before using or sharing the export."
 BASH
 
-chmod +x ~/ubuntu-setup-export/backup-ubuntu-setup.sh
+chmod +x ~/ubuntu-setup-exports/backup-ubuntu-setup.sh
 
-echo "Created ~/ubuntu-setup-export/backup-ubuntu-setup.sh"
+echo "Created ~/ubuntu-setup-exports/backup-ubuntu-setup.sh"
 echo "Run it with:"
-echo "  bash ~/ubuntu-setup-export/backup-ubuntu-setup.sh"
+echo "  bash ~/ubuntu-setup-exports/backup-ubuntu-setup.sh"

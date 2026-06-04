@@ -26,16 +26,16 @@ The main file, `linux-back.sh`, is a creator script.
 When you run it, it creates another script here:
 
 ```bash
-~/ubuntu-setup-export/backup-ubuntu-setup.sh
+~/ubuntu-setup-exports/backup-ubuntu-setup.sh
 ```
 
-That generated script is the actual export script. When you run the generated script, it creates the setup export folder, restore helper scripts, and a generated README with restore instructions.
+That generated script is the actual export script. When you run the generated script, it creates a timestamped setup export folder, restore helper scripts, and a generated README with restore instructions.
 
 That two-step flow is intentional:
 
 1. The repository contains one portable bootstrap script.
 2. Running it creates a reusable backup/export script in your home directory.
-3. Running the generated export script creates the actual setup snapshot and instructions.
+3. Running the generated export script creates a timestamped setup snapshot and instructions.
 
 This is helpful because the exported folder becomes self-documenting. It does not just contain lists of packages; it also contains restore helpers and guidance for using them later.
 
@@ -50,14 +50,22 @@ Run the creator script:
 Then run the generated export script:
 
 ```bash
-bash ~/ubuntu-setup-export/backup-ubuntu-setup.sh
+bash ~/ubuntu-setup-exports/backup-ubuntu-setup.sh
 ```
 
-The export will be written to:
+The export will be written to a timestamped folder under:
 
 ```bash
-~/ubuntu-setup-export/
+~/ubuntu-setup-exports/
 ```
+
+For example:
+
+```bash
+~/ubuntu-setup-exports/ubuntu-setup-export-2026-06-04_13-45-20/
+```
+
+You can rerun the generated export script whenever you want a fresh snapshot. Each run creates a new timestamped folder instead of overwriting the previous export.
 
 ## Emailing The Export
 
@@ -74,7 +82,7 @@ sudo apt install p7zip-full
 Create a compressed, password-protected archive:
 
 ```bash
-7z a -t7z -m0=lzma2 -mx=9 -mhe=on -p ~/ubuntu-setup-export.7z ~/ubuntu-setup-export/
+LATEST_EXPORT="$(find ~/ubuntu-setup-exports -maxdepth 1 -type d -name 'ubuntu-setup-export-*' | sort | tail -n 1)" && 7z a -t7z -m0=lzma2 -mx=9 -mhe=on -p "${LATEST_EXPORT}.7z" "${LATEST_EXPORT}/"
 ```
 
 You will be prompted for a password. Use a strong password and store it somewhere safe, because the archive cannot be restored without it.
@@ -82,13 +90,13 @@ You will be prompted for a password. Use a strong password and store it somewher
 On the new machine, extract it with:
 
 ```bash
-7z x ~/ubuntu-setup-export.7z -o~
+mkdir -p ~/ubuntu-setup-exports && 7z x ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS.7z -o"${HOME}/ubuntu-setup-exports"
 ```
 
 Then restore from the extracted folder:
 
 ```bash
-cd ~/ubuntu-setup-export
+cd ~/ubuntu-setup-exports/ubuntu-setup-export-YYYY-MM-DD_HH-MM-SS
 ```
 
 ## What It Does Not Back Up
