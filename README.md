@@ -59,6 +59,38 @@ The export will be written to:
 ~/ubuntu-setup-export/
 ```
 
+## Emailing The Export
+
+If you want to email the export folder to yourself, create an encrypted archive first.
+
+The recommended option is `7z`, because it supports strong AES-256 encryption and can hide the archive filenames too.
+
+Install it if needed:
+
+```bash
+sudo apt install p7zip-full
+```
+
+Create a compressed, password-protected archive:
+
+```bash
+7z a -t7z -m0=lzma2 -mx=9 -mhe=on -p ~/ubuntu-setup-export.7z ~/ubuntu-setup-export/
+```
+
+You will be prompted for a password. Use a strong password and store it somewhere safe, because the archive cannot be restored without it.
+
+On the new machine, extract it with:
+
+```bash
+7z x ~/ubuntu-setup-export.7z -o~
+```
+
+Then restore from the extracted folder:
+
+```bash
+cd ~/ubuntu-setup-export
+```
+
 ## What It Does Not Back Up
 
 This is not a personal data backup.
